@@ -57,7 +57,7 @@ class NativeApp extends PageCarton_Widget
      * 
      * 
      */
-	protected static function populatePostData()
+	public static function populatePostData()
     {    
         if( empty( $_POST ) )
         {

@@ -48,15 +48,44 @@ class NativeApp_Authenticate extends NativeApp
             'user_id' => $authInfo['user_id'],
             'auth_token' => $authInfo['auth_token'],
         );
-    //    var_export( $userIdentifier  );
-    //    var_export( $table->select()  );
         if( ! $auth = $table->selectOne( null, $userIdentifier ) )
         {
             return false;
         }
-    //    var_export( Application_User_Abstract::getUserInfo( array( 'user_id' => $authInfo['user_id'] ) ) );
         $userInfo = self::getUserInfo( array( 'email' => $auth['email'] ) );
         return $userInfo;
+    }
+
+    /**
+     * Returns user info from auth token
+     * 
+     * @param array Auth Info
+     * @return array
+     * 
+     */
+	public static function getAuthInfo( array $userInfo )
+    {
+        $response = array();
+        $authToken = md5( uniqid( json_encode( $userInfo ), true ) );
+
+        //  save auth info in data
+        $table = NativeApp_Authenticate_Table::getInstance();
+
+        $authInfoToSave = array( 
+            'user_id' => strval( $userInfo['user_id'] ),
+            'email' => strtolower( $userInfo['email'] ),
+            'auth_token' => $authToken,
+            'device_info' => $_POST['device_info'],
+        );
+
+        $table->insert( $authInfoToSave );
+        $otherSettings['supported_versions'] = self::$_supportedClientVersions;
+        $otherSettings['current_stable_version'] = self::$_currentStableClientVersion;
+
+        $response += $authInfoToSave;
+        $response += $userInfo;
+        $response += $otherSettings;
+        return $response;
     }
 
     /**
@@ -86,25 +115,7 @@ class NativeApp_Authenticate extends NativeApp
            
             if( $userInfo = Ayoola_Access_Login::localLogin( $authInfo ) )
             {
-                $authToken = md5( uniqid( json_encode( $authInfo ), true ) );
-
-                //  save auth info in data
-                $table = NativeApp_Authenticate_Table::getInstance();
-
-                $authInfoToSave = array( 
-                    'user_id' => strval( $userInfo['user_id'] ),
-                    'email' => strtolower( $userInfo['email'] ),
-                    'auth_token' => $authToken,
-                    'device_info' => $_POST['device_info'],
-                );
-
-                $table->insert( $authInfoToSave );
-                $otherSettings['supported_versions'] = self::$_supportedClientVersions;
-                $otherSettings['current_stable_version'] = self::$_currentStableClientVersion;
-
-                $this->_objectData += $authInfoToSave;
-                $this->_objectData += $userInfo;
-                $this->_objectData += $otherSettings;
+                $this->_objectData += self::getAuthInfo( $userInfo );
             }
             else
             {
