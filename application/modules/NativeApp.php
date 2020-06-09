@@ -65,5 +65,14 @@ class NativeApp extends PageCarton_Widget
             $_POST = json_decode( file_get_contents( 'php://input' ), true );
         }
     }
+
+    /**
+     * 
+     * 
+     */
+	public function init()
+    {    
+        $this->setViewContent( self::__( '<p class="goodnews">Native app running successfully.</p>' ) ); 
+    }
 	// END OF CLASS
 }
