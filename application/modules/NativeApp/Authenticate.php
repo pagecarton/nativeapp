@@ -107,7 +107,7 @@ class NativeApp_Authenticate extends NativeApp
                     'badnews' => 'email & password cannot be empty'
                 );
                 $this->_objectData = $errorInfo;
-                return false;
+                return false; 
             }
             $authInfo = array( 
                 'email' => $_POST['email'],
