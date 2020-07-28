@@ -45,7 +45,7 @@ class NativeApp_Authenticate extends NativeApp
         $table = NativeApp_Authenticate_Table::getInstance();
 
         $userIdentifier = array( 
-            'user_id' => $authInfo['user_id'],
+            'user_id' => $authInfo['auth_user_id'] ? : $authInfo['user_id'],
             'auth_token' => $authInfo['auth_token'],
         );
         if( ! $auth = $table->selectOne( null, $userIdentifier ) )
@@ -76,6 +76,7 @@ class NativeApp_Authenticate extends NativeApp
             'email' => strtolower( $userInfo['email'] ),
             'auth_token' => $authToken,
             'device_info' => $_POST['device_info'],
+            'auth_data' => $userInfo['auth_data'],
         );
 
         $table->insert( $authInfoToSave );

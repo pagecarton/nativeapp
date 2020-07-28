@@ -25,7 +25,7 @@ class NativeApp_Authenticate_Table extends PageCarton_Table
      *
      * @param string
      */
-    protected $_tableVersion = '0.1';  
+    protected $_tableVersion = '0.2';  
 
     /**
      * Table data types and declaration
@@ -38,6 +38,7 @@ class NativeApp_Authenticate_Table extends PageCarton_Table
   'auth_token' => 'INPUTTEXT',
   'email' => 'INPUTTEXT',
   'device_info' => 'INPUTTEXT',
+  'auth_data' => 'JSON',
 );
 
 

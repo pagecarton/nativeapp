@@ -27,6 +27,13 @@ class NativeApp extends PageCarton_Widget
 	protected static $_accessLevel = array( 0 );
 	
     /**
+     * Response mode 
+     *
+     * @var string
+     */
+	protected $_playMode = self::PLAY_MODE_JSON;
+	
+    /**
      * Supported client versions. 
      * Clients versions not in this list will be asked to update immediately
      *
@@ -64,6 +71,40 @@ class NativeApp extends PageCarton_Widget
             //  Sometimes, JSON don't get passed
             $_POST = json_decode( file_get_contents( 'php://input' ), true );
         }
+    }
+
+    /**
+     * Returns user info from auth token
+     * 
+     * @param array auth info
+     * @return mixed Array of auth user info
+     * 
+     */
+	public function authenticate( $authInfo = array() )
+    {
+        if( empty( $authInfo ) )
+        {
+            self::populatePostData();
+
+            $authInfo = array();
+            if( ! empty( $_SERVER['HTTP_AUTH_TOKEN'] ) )
+            {
+                $authInfo['auth_token'] = $_SERVER['HTTP_AUTH_TOKEN'];
+                $authInfo['auth_user_id'] = $_SERVER['HTTP_AUTH_USER_ID'];
+            }
+            elseif( ! empty( $_REQUEST['auth_token'] ) )
+            {
+                $authInfo['auth_token'] = $_REQUEST['auth_token'];
+                $authInfo['auth_user_id'] = $_REQUEST['auth_user_id'] ? : $_REQUEST['user_id'];
+            }
+        }
+        if( $x = NativeApp_Authenticate::getAuthUserInfo( $authInfo ) )
+        {
+            $this->_objectData['authenticated'] = true;
+            return $x;
+        }
+        $this->_objectData['authenticated'] = false;
+        return false;
     }
 
     /**

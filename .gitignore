@@ -1,2 +1,9 @@
 .trash/
 application/databases/Application/Log/
+application/databases/NativeApp/Authenticate/otptable.xml
+application/databases/PageCarton/Cron/Run/table.xml
+application/databases/NativeApp/Authenticate/table.xml
+application/databases/Ayoola/Access/localuser.xml
+application/databases/Application/notification.xml
+application/databases/Application/settings.xml
+application/databases/Application/Settings/settingsname.xml
