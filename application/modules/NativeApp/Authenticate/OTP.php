@@ -107,8 +107,6 @@ class NativeApp_Authenticate_OTP extends NativeApp_Authenticate
             {
                 $otp = rand( 100000, 999999 );
                 $message = 'Your ' . Ayoola_Application::getDomainName() . ' OTP: ' . implode( '-', str_split( $otp, 3 ) );
-                var_export( $message );
-                $message = urlencode( $message );
                 $search = array( '{{{phone_number}}}', '{{{message}}}' );
                 $replace = array( $phone, $message  );
                 NativeApp_Authenticate_OTPTable::getInstance()->delete( $where );
@@ -120,6 +118,7 @@ class NativeApp_Authenticate_OTP extends NativeApp_Authenticate
                         $this->_objectData['badnews'] = "No SMS API Template is set on server. Please check the NativeApp Settings";
                         return false;
                     }
+                    $message = urlencode( $message );
                     $smsApi = trim( str_ireplace( $search, $replace, $smsApi ) );
                     if( stripos( $smsApi, 'https://' ) !== 0 && stripos( $smsApi, 'http://' ) !== 0 )
                     {
@@ -129,6 +128,7 @@ class NativeApp_Authenticate_OTP extends NativeApp_Authenticate
                     $response = self::fetchLink( $smsApi );
                     $this->_objectData['sms_response'] = $response;
                     //    $this->_objectData['sms_api'] = $smsApi;
+                    $this->_objectData['otp'] = $otp;
                     $this->_objectData['goodnews'] = 'OTP Sent to ' . $phone;
                 }
                 else
@@ -138,6 +138,7 @@ class NativeApp_Authenticate_OTP extends NativeApp_Authenticate
                         'subject' => 'OTP',
                         'body' => $message,
                     );
+                    $this->_objectData['otp'] = $otp;
                     $this->_objectData['goodnews'] = 'OTP Sent to ' . $email;
                     self::sendMail( $mailInfo );
                 }
@@ -147,6 +148,7 @@ class NativeApp_Authenticate_OTP extends NativeApp_Authenticate
             $otp = $_POST['otp'];
             if( ! $otpInfo = NativeApp_Authenticate_OTPTable::getInstance()->selectOne( null, $where + array( 'otp' => $otp ) ) )
             {
+                $this->_objectData['x'] = $_POST;
                 $this->_objectData['badnews'] = "Wrong OTP";
                 return false;
             }
