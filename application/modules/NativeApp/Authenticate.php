@@ -52,7 +52,7 @@ class NativeApp_Authenticate extends NativeApp
         {
             return false;
         }
-        $userInfo = self::getUserInfo( array( 'email' => $auth['email'] ) );
+        $userInfo = Application_User_Abstract::getUserInfo( array( 'email' => $auth['email'] ) );
         return $userInfo;
     }
 
