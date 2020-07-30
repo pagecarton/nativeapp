@@ -51,7 +51,14 @@ class NativeApp_Settings extends PageCarton_Settings
 
         $fieldset->addElement( array( 'name' => 'country_code', 'label' => 'Default Country Code', 'placeholder' => 'e.g. +234', 'value' => @$settings['country_code'], 'type' => 'InputText' ) );
         
-		$fieldset->addElement( array( 'name' => 'sms_api', 'label' => 'SMS API Template', 'placeholder' => 'e.g. https://pmcsms.com/api/v1/http.php?api_key=45d0d9c6&recipient={{{phone_number}}}&message={{{message}}}&sender=senderid&route=3', 'value' => @$settings['sms_api'], 'type' => 'TextArea' ) );
+        $fieldset->addElement( array( 'name' => 'sms_api', 'label' => 'SMS API Template', 'placeholder' => 'e.g. https://pmcsms.com/api/v1/http.php?api_key=45d0d9c6&recipient={{{phone_number}}}&message={{{message}}}&sender=senderid&route=3', 'value' => @$settings['sms_api'], 'type' => 'TextArea' ) );
+        
+        $fieldset->addElement( array( 'name' => 'auth_options', 'label' => 'Authentication Options', 'value' => @$settings['auth_options'], 'type' => 'Checkbox' ), 
+        array( 
+                'phone_number_verification' => 'Verify Phone Number', 
+                'email_verification' => 'Verify Email Addresses', 
+            ) 
+        );
 
 		
 		$fieldset->addLegend( 'NativeApp Settings' ); 

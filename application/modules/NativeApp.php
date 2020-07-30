@@ -80,14 +80,14 @@ class NativeApp extends PageCarton_Widget
      * @return mixed Array of auth user info
      * 
      */
-	public function authenticate( $authInfo = array() )
+	public static function authenticateSession( $authInfo = array() )
     {
         if( empty( $authInfo ) )
         {
             self::populatePostData();
 
             $authInfo = array();
-            if( ! empty( $_SERVER['HTTP_AUTH_TOKEN'] ) )
+            if( ! empty( $_SERVER['HTTP_AUTH_TOKEN'] ) && ! empty( $_SERVER['HTTP_AUTH_USER_ID'] ) )
             {
                 $authInfo['auth_token'] = $_SERVER['HTTP_AUTH_TOKEN'];
                 $authInfo['auth_user_id'] = $_SERVER['HTTP_AUTH_USER_ID'];
@@ -97,8 +97,32 @@ class NativeApp extends PageCarton_Widget
                 $authInfo['auth_token'] = $_REQUEST['auth_token'];
                 $authInfo['auth_user_id'] = $_REQUEST['auth_user_id'] ? : $_REQUEST['user_id'];
             }
+            else
+            {
+                return false;
+            }
         }
         if( $x = NativeApp_Authenticate::getAuthUserInfo( $authInfo ) )
+        {
+            if( $userInfo = Ayoola_Access_Login::localLogin( $x ) )
+            {
+                
+            }
+            return $x;
+        }
+        return false;
+    }
+
+    /**
+     * Returns user info from auth token
+     * 
+     * @param array auth info
+     * @return mixed Array of auth user info
+     * 
+     */
+	public function authenticate( $authInfo = array() )
+    {
+        if( $x = self::authenticateSession( $authInfo ) )
         {
             $this->_objectData['authenticated'] = true;
             return $x;

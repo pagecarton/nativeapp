@@ -45,6 +45,7 @@ class NativeApp_Authenticate_OTP extends NativeApp_Authenticate
             self::populatePostData();
             $phone = trim( $_POST['phone_number'] );
             $email = trim( $_POST['email'] );
+            $otpMode = 'phone_number';
             if( empty( $phone ) )
             {
                 if( empty( $email ) )
@@ -52,6 +53,7 @@ class NativeApp_Authenticate_OTP extends NativeApp_Authenticate
                     $this->_objectData['badnews'] = "Phone number is required to login";
                     return false;
                 }
+                $otpMode = 'email';
             }
             elseif( ! is_numeric( $phone ) )
             {
@@ -102,50 +104,19 @@ class NativeApp_Authenticate_OTP extends NativeApp_Authenticate
                     return false;
                 }
             }
-            $where = array( 'email' => $email, 'phone_number' => $phone );
-            if( empty( $_POST['otp'] ) )
+            if( empty( $_POST['otp'] ) or ! $otp = $_POST['otp'] )
             {
-                $otp = rand( 100000, 999999 );
-                $message = 'Your ' . Ayoola_Application::getDomainName() . ' OTP: ' . implode( '-', str_split( $otp, 3 ) );
-                $search = array( '{{{phone_number}}}', '{{{message}}}' );
-                $replace = array( $phone, $message  );
-                NativeApp_Authenticate_OTPTable::getInstance()->delete( $where );
-                $responseT = NativeApp_Authenticate_OTPTable::getInstance()->insert( $where + array( 'otp' => $otp ) );
                 if( ! empty( $phone ) )
                 {
-                    if( ! $smsApi = NativeApp_Settings::retrieve( "sms_api" ) )
-                    {
-                        $this->_objectData['badnews'] = "No SMS API Template is set on server. Please check the NativeApp Settings";
-                        return false;
-                    }
-                    $message = urlencode( $message );
-                    $smsApi = trim( str_ireplace( $search, $replace, $smsApi ) );
-                    if( stripos( $smsApi, 'https://' ) !== 0 && stripos( $smsApi, 'http://' ) !== 0 )
-                    {
-                        $this->_objectData['badnews'] = "SMS API template must start with 'https://' e.g. https://pmcsms.com/api/v1/http.php?api_key=362g59483&recipient={{{phone_number}}}&message={{{message}}}&sender=senderid&route=3";
-                        return false;
-                    }
-                    $response = self::fetchLink( $smsApi );
-                    $this->_objectData['sms_response'] = $response;
-                    //    $this->_objectData['sms_api'] = $smsApi;
-                    $this->_objectData['otp'] = $otp;
-                    $this->_objectData['goodnews'] = 'OTP Sent to ' . $phone;
+                    $response = self::sendSMSOTP( $phone );
                 }
                 else
                 {
-                    $mailInfo = array(
-                        'to' => $email,
-                        'subject' => 'OTP',
-                        'body' => $message,
-                    );
-                    $this->_objectData['otp'] = $otp;
-                    $this->_objectData['goodnews'] = 'OTP Sent to ' . $email;
-                    self::sendMail( $mailInfo );
+                    $response = self::sendEmailOTP( $email );
                 }
-
+                $this->_objectData += $response;
                 return true;
             }
-            $otp = $_POST['otp'];
             if( ! $otpInfo = NativeApp_Authenticate_OTPTable::getInstance()->selectOne( null, $where + array( 'otp' => $otp ) ) )
             {
                 $this->_objectData['x'] = $_POST;
@@ -180,6 +151,73 @@ class NativeApp_Authenticate_OTP extends NativeApp_Authenticate
             $this->setViewContent( self::__( '<p class="badnews">Theres an error in the code</p>' ) ); 
             return false; 
         }
+    }
+    
+    /**
+     * 
+     * 
+     */
+	public static function sendSMSOTP( $phone )
+    {    
+        $otp = rand( 100000, 999999 );
+        $message = 'Your ' . Ayoola_Application::getDomainName() . ' OTP is ' . implode( '-', str_split( $otp, 3 ) );
+        $search = array( '{{{phone_number}}}', '{{{message}}}' );
+        $message = urlencode( $message );
+        $replace = array( $phone, $message  );
+        $where = array( 'phone_number' => $phone );
+        NativeApp_Authenticate_OTPTable::getInstance()->delete( $where );
+        $responseT = NativeApp_Authenticate_OTPTable::getInstance()->insert( $where + array( 'otp' => $otp ) );
+        $x = array();
+        if( empty( $phone ) )
+        {
+            $x['badnews'] = "No phone number is set";
+            return $x;
+        }
+        if( ! $smsApi = NativeApp_Settings::retrieve( "sms_api" ) )
+        {
+            $x['badnews'] = "No SMS API Template is set on server. Please check the NativeApp Settings";
+            return $x;
+        }
+        $smsApi = trim( str_ireplace( $search, $replace, $smsApi ) );
+        if( stripos( $smsApi, 'https://' ) !== 0 && stripos( $smsApi, 'http://' ) !== 0 )
+        {
+            $x['badnews'] = "SMS API template must start with 'https://' e.g. https://pmcsms.com/api/v1/http.php?api_key=362g59483&recipient={{{phone_number}}}&message={{{message}}}&sender=senderid&route=3";
+            return $x;
+        }
+        $response = self::fetchLink( $smsApi );
+        $x['sms_response'] = $response;
+        $x['otp'] = $otp;
+        $x['goodnews'] = 'OTP Sent to ' . $phone;
+        return $x;
+    }    
+    
+    /**
+     * 
+     * 
+     */
+	public function sendEmailOTP( $email )
+    {    
+        $x = array();
+        $otp = rand( 100000, 999999 );
+        $message = 'Your ' . Ayoola_Application::getDomainName() . ' OTP: ' . implode( '-', str_split( $otp, 3 ) );
+        $search = array( '{{{phone_number}}}', '{{{message}}}' );
+        $replace = array( $phone, $message  );
+        $where = array( 'email' => $email );
+        NativeApp_Authenticate_OTPTable::getInstance()->delete( $where );
+        $responseT = NativeApp_Authenticate_OTPTable::getInstance()->insert( $where + array( 'otp' => $otp ) );
+
+        $mailInfo = array(
+            'to' => $email,
+            'subject' => 'OTP',
+            'body' => $message,
+        );
+
+        $response = self::sendMail( $mailInfo );
+        $x['email_response'] = $response;
+        $x['otp'] = $otp;
+        $x['goodnews'] = 'OTP Sent to ' . $email;
+        return $x;
 	}
+
 	// END OF CLASS
 }
