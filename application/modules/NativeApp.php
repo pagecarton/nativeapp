@@ -72,6 +72,16 @@ class NativeApp extends PageCarton_Widget
             $_POST = json_decode( file_get_contents( 'php://input' ), true );
         }
     }
+    /**
+     * 
+     */
+	public function setUnauthorized()
+    {
+        header("HTTP/1.1 401 Unauthorized");
+        $this->_objectData['badnews'] = 'Current user is unauthorized';
+        $this->_objectData['http_code'] = 401;
+        return false;
+    }
 
     /**
      * Returns user info from auth token
