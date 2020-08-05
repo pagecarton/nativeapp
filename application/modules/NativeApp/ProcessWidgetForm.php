@@ -56,7 +56,7 @@ class NativeApp_ProcessWidgetForm extends NativeApp
             }
             $parameters =  array( 
                 'fake_values' => $_POST, 
-                'return_json' => true,
+                'return_object_data' => true,
                 'play_mode' => $this->getParameter( 'play_mode' ) 
             );
             $obj = new $class( $parameters );

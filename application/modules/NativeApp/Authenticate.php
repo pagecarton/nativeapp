@@ -57,6 +57,17 @@ class NativeApp_Authenticate extends NativeApp
     }
 
     /**
+     * 
+     */
+	public static function setUnauthorized()
+    {
+        header("HTTP/1.1 401 Unauthorized");
+        $this->_objectData['badnews'] = 'Current user is unauthorized';
+        $this->_objectData['http_code'] = 401;
+        return false;
+    }
+
+    /**
      * Returns user info from auth token
      * 
      * @param array Auth Info
