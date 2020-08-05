@@ -72,6 +72,7 @@ class NativeApp extends PageCarton_Widget
             $_POST = json_decode( file_get_contents( 'php://input' ), true );
         }
     }
+    
     /**
      * 
      */
