@@ -39,7 +39,7 @@ class NativeApp_Profile_Relationship_Creator extends NativeApp_Profile_Relations
      * The method does the whole Class Process
      * 
      */
-	protected function init()
+	public function init()
     {
 		try
 		{ 

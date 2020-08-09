@@ -49,7 +49,7 @@ class NativeApp_Settings extends PageCarton_Settings
 		$form->oneFieldSetAtATime = true;
 		$fieldset = new Ayoola_Form_Element;
 
-        $fieldset->addElement( array( 'name' => 'country_code', 'label' => 'Default Country Code', 'placeholder' => 'e.g. +234', 'value' => @$settings['country_code'], 'type' => 'InputText' ) );
+        $fieldset->addElement( array( 'name' => 'country_code', 'label' => 'Default Country Code', 'placeholder' => 'e.g. 234', 'value' => @$settings['country_code'], 'type' => 'InputText' ) );
         
         $fieldset->addElement( array( 'name' => 'sms_api', 'label' => 'SMS API Template', 'placeholder' => 'e.g. https://pmcsms.com/api/v1/http.php?api_key=45d0d9c6&recipient={{{phone_number}}}&message={{{message}}}&sender=senderid&route=3', 'value' => @$settings['sms_api'], 'type' => 'TextArea' ) );
         

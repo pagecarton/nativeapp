@@ -26,13 +26,43 @@ class NativeApp_Hook extends NativeApp
      */
 	public function hook( $class, $method, & $content )
     {
-        switch( strtolower( $method ) )
+        $widget = $class;
+        if( is_object( $widget ) )
         {
-            case '__construct':
-                if( ! $userInfo = self::authenticateSession() )
+            $widget = get_class( $widget );
+        }
+
+        switch( $widget )
+        {
+            case 'Ayoola_Event_NewSession':
+                switch( strtolower( $method ) )
                 {
-                //    return false;
-                }   
+                    case '__construct':
+                        if( ! $userInfo = self::authenticateSession() )
+                        {
+                        //    return false;
+                        }   
+                    break;
+                }
+            break;
+            case 'Application_SiteInfo':
+                switch( strtolower( $method ) )
+                {
+                    case 'view':
+                        if( ! is_array( $content ) )
+                        {
+                            continue;
+                        }
+                        $settingsOptions = array(
+                            'country_code',
+                            'auth_options',
+                        );
+                        foreach( $settingsOptions as $each )
+                        {
+                            $content[$each] = NativeApp_Settings::retrieve( $each );
+                        }
+                    break;
+                }
             break;
         }
     }
