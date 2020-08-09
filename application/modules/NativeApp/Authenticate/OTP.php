@@ -128,7 +128,7 @@ class NativeApp_Authenticate_OTP extends NativeApp_Authenticate
                         $this->_objectData['response'] = $response;
                     }
                 }
-                else
+                if( ! empty( $email ) )
                 {
                     $response = self::sendEmailOTP( $email );
                     if( ! in_array( 'email_verification', $signUpRequirements ) )
