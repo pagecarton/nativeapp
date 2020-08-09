@@ -45,15 +45,15 @@ class NativeApp_Authenticate_OTP extends NativeApp_Authenticate
             self::populatePostData();
             $phone = trim( $_POST['phone_number'] );
             $email = trim( $_POST['email'] );
-            $otpMode = 'phone_number';
-            if( empty( $phone ) )
+            $otpModeForPhone = true;
+            if( empty( $phone ) || ! NativeApp_Settings::retrieve( "sms_api" ) )
             {
                 if( empty( $email ) )
                 {
                     $this->_objectData['badnews'] = "Phone number is required to login";
                     return false;
                 }
-                $otpMode = 'email';
+                $otpModeForPhone = false;
             }
             elseif( ! is_numeric( $phone ) )
             {
@@ -104,17 +104,46 @@ class NativeApp_Authenticate_OTP extends NativeApp_Authenticate
                     return false;
                 }
             }
+            $authInfo = array();
+
+            //  save auth info in data
+            $authInfoToSave = NativeApp_Authenticate::getAuthInfo( $userInfo );
+
+            $authInfo += $authInfoToSave;
+            $authInfo += $userInfo;
+
             if( empty( $_POST['otp'] ) or ! $otp = $_POST['otp'] )
             {
-                if( ! empty( $phone ) )
+                if( ! $signUpRequirements = NativeApp_Settings::retrieve( "auth_options" ) )
+                {
+                    $signUpRequirements = array();
+                }
+                if( ! empty( $phone ) && $otpModeForPhone )
                 {
                     $response = self::sendSMSOTP( $phone );
+                    if( ! in_array( 'phone_number_verification', $signUpRequirements ) )
+                    {
+                        $this->_objectData['goodnews'] = "Log in successful";
+                        $this->_objectData['auth_info'] = $authInfo;
+                        $this->_objectData['response'] = $response;
+                    }
                 }
                 else
                 {
                     $response = self::sendEmailOTP( $email );
+                    if( ! in_array( 'email_verification', $signUpRequirements ) )
+                    {
+                        $this->_objectData['goodnews'] = "Log in successful";
+                        $this->_objectData['auth_info'] = $authInfo;
+                        $this->_objectData['response'] = $response;
+                    }
                 }
                 $this->_objectData += $response;
+
+                if( $signUpRequirements = NativeApp_Settings::retrieve( "auth_options" ) )
+                {
+
+                }
                 return true;
             }
             if( ! $otpInfo = NativeApp_Authenticate_OTPTable::getInstance()->selectOne( null, $where + array( 'otp' => $otp ) ) )
@@ -125,20 +154,8 @@ class NativeApp_Authenticate_OTP extends NativeApp_Authenticate
             }
             NativeApp_Authenticate_OTPTable::getInstance()->delete( $where );
 
-            $authInfo = array();
-
-            //  save auth info in data
-            $authInfoToSave = NativeApp_Authenticate::getAuthInfo( $userInfo );
-            
-            $otherSettings['supported_versions'] = self::$_supportedClientVersions;
-            $otherSettings['current_stable_version'] = self::$_currentStableClientVersion;
-
-            $authInfo += $authInfoToSave;
-            $authInfo += $userInfo;
-
             $this->_objectData['goodnews'] = "Log in successful";
             $this->_objectData['auth_info'] = $authInfo;
-            $this->_objectData += $otherSettings;
             $this->_objectData['response'] = $response;
                  
             // end of widget process
