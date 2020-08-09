@@ -113,7 +113,7 @@ class NativeApp extends PageCarton_Widget
                 return false;
             }
         }
-        if( $x = NativeApp_Authenticate::getAuthUserInfo( $authInfo ) )
+        if( $userInfo = NativeApp_Authenticate::getAuthUserInfo( $authInfo ) )
         {
             if( $userInfo = Ayoola_Access_Login::localLogin( $x ) )
             {

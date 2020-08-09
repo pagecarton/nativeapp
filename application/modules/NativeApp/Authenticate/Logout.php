@@ -44,14 +44,25 @@ class NativeApp_Authenticate_Logout extends NativeApp_Authenticate
             //  Code that runs the widget goes here...
             self::populatePostData();
             $table = NativeApp_Authenticate_Table::getInstance();
+            if( ! $userInfo = Ayoola_Application::getUserInfo() )
+            {
+                //    $this->_objectData['tokenize'] = $_SERVER['HTTP_AUTH_TOKEN'];
+                return false;
+            }
+            //  $this->_objectData['userInfo'] = $userInfo;
+            if( ! Ayoola_Application::getUserInfo( 'email' ) )
+            {
+                return false;
+            }
             $response = $table->delete( 
                 array(
-                    'auth_token' => $_POST['auth_token'],
+                    'email' => Ayoola_Application::getUserInfo( 'email' ),
                 )
              );
              $auth = new Ayoola_Access();
              $auth->logout();
-             $this->_objectData['response'] = $response;
+             $this->_objectData['devices_logged_out'] = $response;
+             $this->_objectData['current_device_token'] = $_SERVER['HTTP_AUTH_TOKEN'];
                  
             // end of widget process
           
