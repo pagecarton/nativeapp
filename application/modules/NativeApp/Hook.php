@@ -56,11 +56,20 @@ class NativeApp_Hook extends NativeApp
                         $settingsOptions = array(
                             'country_code',
                             'auth_options',
+                            'android_download_link',
+                            'ios_download_link',
                         );
                         foreach( $settingsOptions as $each )
                         {
                             $content[$each] = NativeApp_Settings::retrieve( $each );
                         }
+                        $supported = NativeApp_Settings::retrieve( 'supported_versions' );
+                        if( $supported = trim( $supported ) )
+                        {
+                            $supported = array_map( 'trim', explode( ',', $supported ) );
+                            $content['supported_versions'] = $supported;
+                        }
+                        $content['current_stable_version'] = NativeApp_Settings::retrieve( 'current_stable_version' );
                     break;
                 }
             break;

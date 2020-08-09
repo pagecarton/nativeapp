@@ -60,6 +60,14 @@ class NativeApp_Settings extends PageCarton_Settings
             ) 
         );
 
+        $fieldset->addElement( array( 'name' => 'supported_versions', 'label' => 'Supported Versions (Comma separated)', 'placeholder' => 'e.g. 0.0.1, 0.0.2, 0.0.3', 'value' => @$settings['supported_versions'], 'type' => 'InputText' ) );
+
+        $fieldset->addElement( array( 'name' => 'current_stable_version', 'label' => 'Current Stable Version', 'placeholder' => 'e.g. 1.0.2', 'value' => @$settings['current_stable_version'], 'type' => 'InputText' ) );
+
+        $fieldset->addElement( array( 'name' => 'android_download_link', 'label' => 'Android Store Link', 'placeholder' => 'e.g. https://play.google.com/store/apps/details?id=ng.com.example.app', 'value' => @$settings['android_download_link'], 'type' => 'InputText' ) );
+
+        $fieldset->addElement( array( 'name' => 'ios_download_link', 'label' => 'iOS Store Link', 'placeholder' => 'e.g. https://apps.apple.com/ng/app/apple-store/id375380948', 'value' => @$settings['ios_download_link'], 'type' => 'InputText' ) );
+
 		
 		$fieldset->addLegend( 'NativeApp Settings' ); 
                
