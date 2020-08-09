@@ -72,6 +72,23 @@ class NativeApp extends PageCarton_Widget
             $_POST = json_decode( file_get_contents( 'php://input' ), true );
         }
     }
+
+    /**
+     * 
+     * 
+     */
+	public static function getVersionInfo()
+    {    
+        $options = array();
+        $supported = NativeApp_Settings::retrieve( 'supported_versions' );
+        if( $supported = trim( $supported ) )
+        {
+            $supported = array_map( 'trim', explode( ',', $supported ) );
+            $options['supported_versions'] = $supported;
+        }
+        $options['current_stable_version'] = NativeApp_Settings::retrieve( 'current_stable_version' );
+        return $options;
+    }
     
     /**
      * 

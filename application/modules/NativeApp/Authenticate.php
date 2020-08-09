@@ -80,12 +80,10 @@ class NativeApp_Authenticate extends NativeApp
         );
 
         $table->insert( $authInfoToSave );
-        $otherSettings['supported_versions'] = self::$_supportedClientVersions;
-        $otherSettings['current_stable_version'] = self::$_currentStableClientVersion;
 
         $response += $authInfoToSave;
         $response += $userInfo;
-        $response += $otherSettings;
+        $response += self::getVersionInfo();
         return $response;
     }
 
