@@ -49,12 +49,12 @@ class NativeApp_Profile_Relationship_Creator extends NativeApp_Profile_Relations
                 $this->_objectData['badnews'] = 'No subject or object profile in request';
                 return false;
             }
-            if( empty( $request['subject'] ) OR ! $sInfo = self::getProfileInfo( $request['subject'] ) )
+            if( empty( $request['subject'] ) OR ! $sInfo = Application_Profile_Abstract::getProfileInfo( $request['subject'] ) )
             { 
                 $this->_objectData['badnews'] = 'Invalid subject profile';
                 return false;
             }
-            if( empty( $request['object'] ) OR ! $oInfo = self::getProfileInfo( $request['object'] ) )
+            if( empty( $request['object'] ) OR ! $oInfo = Application_Profile_Abstract::getProfileInfo( $request['object'] ) )
             { 
                 $this->_objectData['badnews'] = 'Invalid object profile';
                 return false;
