@@ -24,7 +24,7 @@ class NativeApp_Hook extends NativeApp
      * Converts youtube links in output to embedded video
      * 
      */
-	public function hook( $class, $method, & $content )
+	public static function hook( $class, $method, & $content )
     {
         $widget = $class;
         if( is_object( $widget ) )
