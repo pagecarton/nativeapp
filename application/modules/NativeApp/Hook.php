@@ -51,7 +51,7 @@ class NativeApp_Hook extends NativeApp
                     case 'view':
                         if( ! is_array( $content ) )
                         {
-                            continue;
+                            return false;
                         }
                         $settingsOptions = array(
                             'country_code',
